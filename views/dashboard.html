@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Dashboard</title>
+  <link rel="stylesheet" href="/css/style.css">
+</head>
+<body class="bg-gradient-to-r from-blue-50 to-indigo-100 min-h-screen">
+  <div class="max-w-4xl mx-auto p-6">
+    <div class="bg-white rounded-xl shadow-lg p-8 mb-6 border border-gray-200 transform transition-all duration-300 hover:shadow-xl">
+      <h1 class="text-3xl font-bold text-indigo-800 mb-6">Dashboard</h1>
+      <div id="userInfo" class="bg-indigo-50 p-6 rounded-lg border border-indigo-100">
+        <p class="text-gray-600 animate-pulse">Loading user information...</p>
+      </div>
+    </div>
+    <button id="logoutBtn" class="bg-red-600 text-white py-3 px-6 rounded-lg hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2 transition-all duration-300 transform hover:-translate-y-1 font-medium shadow-md">Logout</button>
+  </div>
+
+  <script>
+    // Check if user is authenticated
+    async function checkAuth() {
+      try {
+        const response = await fetch('/api/auth/me');
+        
+        if (!response.ok) {
+          window.location.href = '/';
+          return;
+        }
+        
+        const data = await response.json();
+        displayUserInfo(data.user);
+      } catch (error) {
+        console.error('Error checking authentication:', error);
+        window.location.href = '/';
+      }
+    }
+    
+    // Display user information
+    // Update the displayUserInfo function to use enhanced styling
+    function displayUserInfo(user) {
+      const userInfoDiv = document.getElementById('userInfo');
+      userInfoDiv.innerHTML = `
+        <h2 class="text-2xl font-semibold text-indigo-800 mb-4">Welcome, ${user.username}!</h2>
+        <div class="space-y-3">
+          <p class="text-gray-700 flex items-center">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2 text-indigo-500" viewBox="0 0 20 20" fill="currentColor">
+              <path d="M2.003 5.884L10 9.882l7.997-3.998A2 2 0 0016 4H4a2 2 0 00-1.997 1.884z" />
+              <path d="M18 8.118l-8 4-8-4V14a2 2 0 002 2h12a2 2 0 002-2V8.118z" />
+            </svg>
+            <span>Email: <span class="font-medium">${user.email}</span></span>
+          </p>
+          <p class="text-gray-700 flex items-center">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2 text-indigo-500" viewBox="0 0 20 20" fill="currentColor">
+              <path fill-rule="evenodd" d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z" clip-rule="evenodd" />
+            </svg>
+            <span>Role: <span class="font-medium capitalize bg-indigo-100 text-indigo-800 px-2 py-1 rounded-full text-xs">${user.role}</span></span>
+          </p>
+        </div>
+      `;
+    }
+    
+    // Logout functionality
+    document.getElementById('logoutBtn').addEventListener('click', async () => {
+      try {
+        const response = await fetch('/api/auth/logout', {
+          method: 'POST'
+        });
+        
+        if (response.ok) {
+          window.location.href = '/';
+        }
+      } catch (error) {
+        console.error('Error logging out:', error);
+      }
+    });
+    
+    // Check authentication on page load
+    checkAuth();
+  </script>
+</body>
+</html>
